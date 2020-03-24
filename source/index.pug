@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+html(lang="en")
+    head
+        meta(charset="UTF-8")
+        meta(name="viewport", content="width=device-width, initial-scale=1.0")
+        meta(http-equiv="X-UA-Compatible", content="ie=edge")
+        title TomatoClock
+        link(rel="stylesheet" type="text/css" href="/stylesheets/all.css")
+    body
+        #app
+            .container
+                .sidebar
+                    .mode
+                        li.active
+                            i.far.fa-clone
+                        li
+                            i.fas.fa-music
+                        li
+                            i.far.fa-chart-bar
+                .menu
+                    .todo
+                        .title
+                            span 代辦任務
+                            .icon
+                                i.fas.fa-sort
+                                i.fas.fa-plus
+                        .tasks
+                            li(v-for="todo in todo_tasks")
+                                .description
+                                    i.far.fa-circle
+                                    span {{ todo.title }}
+                                    i.fas.fa-circle.done(v-for="i in todo.tomato_done")
+                                    i.fas.fa-circle(v-for="j in todo.tomato_undo")
+                                .controller
+                                    i.fas.fa-times-circle
+                                    i.fas(:class="[todo.doing? 'fa-pause-circle': 'fa-play-circle']")
+                    .done
+                        .title 已完成任務
+                        .tasks
+                            li(v-for="done in done_tasks")
+                                i.far.fa-check-circle
+                                span {{ done.title }}
+                .main
+                    .clock
+                        .time 12：30   
+                    .controller
+                        i.fas.fa-times
+                        i.fas.fa-pause
+                        i.fas.fa-angle-double-right
+                .side_icon
+                    i.fas.fa-circle.done
+                    i.fas.fa-circle.done
+                    i.fas.fa-circle.done
+                    i.fas.fa-circle.todo
+                    i.fas.fa-circle.todo
+
+
+
+        script(src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js")
+        script(type="text/javascript" src="/javascripts/all.js")
