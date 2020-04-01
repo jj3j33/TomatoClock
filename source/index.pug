@@ -11,48 +11,162 @@ html(lang="en")
             .container
                 .sidebar
                     .mode
-                        li.active
+                        li(@click="menu_mode='task'" :class="{active: menu_mode=='task'}")
                             i.far.fa-clone
-                        li
+                        li(@click="menu_mode='music'" :class="{active: menu_mode=='music'}")
                             i.fas.fa-music
-                        li
+                        li(@click="menu_mode='chart'" :class="{active: menu_mode=='chart'}")
                             i.far.fa-chart-bar
-                .menu
-                    .todo
-                        .title
-                            span 代辦任務
-                            .icon
-                                i.fas.fa-sort
-                                i.fas.fa-plus
-                        .tasks
-                            li(v-for="todo in todo_tasks")
-                                .description
-                                    i.far.fa-circle
-                                    span {{ todo.title }}
-                                    i.fas.fa-circle.done(v-for="i in todo.tomato_done")
-                                    i.fas.fa-circle(v-for="j in todo.tomato_undo")
-                                .controller
-                                    i.fas.fa-times-circle
-                                    i.fas(:class="[todo.doing? 'fa-pause-circle': 'fa-play-circle']")
-                    .done
-                        .title 已完成任務
-                        .tasks
-                            li(v-for="done in done_tasks")
-                                i.far.fa-check-circle
-                                span {{ done.title }}
-                .main
-                    .clock
-                        .time 12：30   
-                    .controller
-                        i.fas.fa-times
-                        i.fas.fa-pause
-                        i.fas.fa-angle-double-right
-                .side_icon
-                    i.fas.fa-circle.done
-                    i.fas.fa-circle.done
-                    i.fas.fa-circle.done
-                    i.fas.fa-circle.todo
-                    i.fas.fa-circle.todo
+                .body
+                    //- task mode
+                    .menu(v-show="menu_mode=='task'")
+                        .todo
+                            .title
+                                span 代辦任務
+                                .icon
+                                    i.fas.fa-sort(@click="sort_mode=!sort_mode")
+                                    i.fas.fa-plus(@click="add=true")
+                            .tasks
+                                li(v-for="(todo, tid) in todo_tasks")
+                                    .description
+                                        i.far.fa-circle(v-if="!sort_mode")
+                                        i.fas.fa-caret-up(v-if="sort_mode" :style="{visibility: tid!=0? 'visible':'hidden'}" @click="sort_up(tid)")
+                                        i.fas.fa-caret-down(v-if="sort_mode" :style="{visibility: tid!=todo_tasks.length-1? 'visible':'hidden'}" @click="sort_down(tid)")
+                                        span {{ todo.title }}
+                                        i.fas.fa-circle.done(v-if="!sort_mode" v-for="i in todo.tomato_done")
+                                        i.fas.fa-circle(v-if="!sort_mode" v-for="j in todo.tomato_undo")
+                                    .controller
+                                        i.fas.fa-times-circle(@click="remove_task(tid)")
+                                        //- playing
+                                        i.fas.fa-pause-circle.active(v-if="!sort_mode&&todo.status=='playing'" @click="pauseCountdown")
+                                        //- pause
+                                        i.fas.fa-play-circle.active(v-if="!sort_mode&&todo.status=='pause'" @click="startCountdown")
+                                        //- stop
+                                        i.fas.fa-play-circle(v-if="!sort_mode&&todo.status=='stop'" @click="play_task(tid)")
+                                        //- i.fas(v-if="!sort_mode" :class="[todo.doing? 'fa-pause-circle': 'fa-play-circle']")
+                        .done
+                            .title 已完成任務
+                            .tasks
+                                li(v-for="done in done_tasks")
+                                    i.far.fa-check-circle
+                                    span {{ done.title }}
+                    //- music mode
+                    .menu(v-show="menu_mode=='music'")
+                        .music
+                            .title
+                            .content
+                                h6 鬧鐘提醒
+                                    label(for="switcher")
+                                        input(type="checkbox" id="switcher")
+                                        span.slider
+                                h6 工作結束鬧鐘
+                                ul.alarm
+                                    li(v-for="w_alarm in alarm_music")
+                                        i.far.fa-circle(:class="{sel: work_alarm==w_alarm.name}" @click="work_alarm=w_alarm.name")
+                                        span {{ w_alarm.name }}
+                                h6 休息結束鬧鐘
+                                ul.alarm
+                                    li(v-for="r_alarm in alarm_music")
+                                        i.far.fa-circle(:class="{sel: rest_alarm==r_alarm.name}" @click="rest_alarm=r_alarm.name")
+                                        span {{ r_alarm.name }}
+                    //- chart mode
+                    .menu(v-show="menu_mode=='chart'")
+                        .chart
+                            .title
+                            .content
+                                .tag
+                                    .caption(@click="chart_mode='tomato'" :class="{active: chart_mode=='tomato'}")
+                                        span 番茄報表
+                                    .caption(@click="chart_mode='task'" :class="{active: chart_mode=='task'}")
+                                        span 任務報表
+                                .main_content(v-if="chart_mode=='tomato'")
+                                    .text_content
+                                        .text.week
+                                            h4 27 
+                                                small hr
+                                            h6 本週專注時間
+                                        .text.day
+                                            h4 3.75 
+                                                small hr
+                                            h6 今日專注時間
+                                        .text.week
+                                            h4 64.8 
+                                                small 顆
+                                            h6 本週番茄數
+                                        .text.day
+                                            h4 9 
+                                                small 顆
+                                            h6 今日番茄數
+                                    .graph
+                                .main_content(v-if="chart_mode=='task'")
+                                    .text_content
+                                        .text.week
+                                            h4 20 
+                                                small 項
+                                            h6 本週任務達成數
+                                        .text.day
+                                            h4 9 
+                                                small 項
+                                            h6 今日任務達成數
+                                        .text.week
+                                            h4 48 
+                                                small %
+                                            h6 本週任務達成率
+                                        .text.day
+                                            h4 70 
+                                                small %
+                                            h6 今日任務達成率
+                                    .graph
+
+                    .main
+                        .clock(:class="{focus: clock_mode=='focus', rest: clock_mode=='rest'}")
+                            .clock_dec
+                            .time {{ time.min<10? "0"+time.min:time.min }}：{{ time.sec<10? "0"+time.sec:time.sec }}
+                        .controller(:class="{focus: clock_mode=='focus', rest: clock_mode=='rest'}")
+                            i.fas.fa-times(@click="stop=true")
+                            i.fas.fa-pause(v-if="countdown" @click="pauseCountdown")
+                            i.fas.fa-play(v-if="!countdown" @click="startCountdown")
+                            i.fas.fa-angle-double-right(@click="rest=true")
+                    .side_icon(:class="{focus: clock_mode=='focus', rest: clock_mode=='rest'}")
+                        i.fas.fa-circle.done(v-if="doing_task!=-1" v-for="i in todo_tasks[doing_task].tomato_done")
+                        i.fas.fa-circle.todo(v-if="doing_task!=-1" v-for="j in todo_tasks[doing_task].tomato_undo")
+                    dialogbox(:add="add" @cancel_add="add=$event" @add_task="add_task")
+                    .dialog_bg(:style="{visibility: stop? 'visible':'hidden'}")
+                        .dialogbox
+                            .title 終止任務
+                            .content
+                                .info 
+                                    h4 您確定要終止目前任務？
+                                    h4 此次番茄鐘將不列入計算。
+                                .btn
+                                    .cancel(@click="stop=false") 取消
+                                    .confirm(@click="stop_doingTask") 確認
+                    .dialog_bg(:style="{visibility: rest? 'visible':'hidden'}")
+                        .dialogbox
+                            .title 跳至休息時間
+                            .content
+                                .info 
+                                    h4 您確定要終止目前任務？
+                                    h4 該番茄鐘將不列入計算。
+                                .btn
+                                    .cancel(@click="rest=false") 取消
+                                    .confirm(@click="toRest") 確認
+                                
+
+        template#dialogbox
+            .dialog_bg(:style="{visibility: add? 'visible':'hidden'}")
+                .dialogbox
+                    .title 新增任務
+                    .content
+                        .info
+                            .caption 任務名稱
+                            input(v-model="task_name")
+                            .caption 番茄數
+                            .tomato
+                                i.far.fa-circle(v-for="i in 5" @click="amount=6-i" :class="{sel: i>=6-amount}")
+                        .btn
+                            .cancel(@click="cancel_add") 取消
+                            .confirm(@click="add_task") 確認  
 
 
 

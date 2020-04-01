@@ -51,6 +51,7 @@ html, body, #app
                 font-size: 30px
                 color: #fff
             &.active
+                background-color: #4F9A94
                 &::after
                     content: ''
                     width: 0px
@@ -60,6 +61,10 @@ html, body, #app
                     border-width: 15px 30px 15px 0px
                     border-style: solid
                     border-color: transparent #92F2E9 transparent transparent
+.body
+    width: calc(100% - 90px)
+    height: 100vh
+    display: flex
 .menu
     width: 420px
     height: 520px
@@ -96,6 +101,7 @@ html, body, #app
             height: 228px
             padding: 4px 24px
             box-sizing: border-box
+            overflow-y: scroll
             li
                 color: #333232
                 border-bottom: 2px solid #D6D6D6
@@ -106,12 +112,21 @@ html, body, #app
                 &:last-child
                     border-bottom: 0
                 .description
+                    display: flex
+                    align-items: center
                     span
                         margin-right: 10px
                     i.far.fa-circle
                         color: #80CBC4
                         font-size: 20px
                         margin-right: 6px
+                    i.fas.fa-caret-up, i.fas.fa-caret-down
+                        width: 16px
+                        height: 24px
+                        font-size: 24px
+                        color: #D6D6D6
+                        margin-right: 6px
+                        cursor: pointer
                     i.fas.fa-circle
                         font-size: 10px
                         width: 10px
@@ -128,11 +143,11 @@ html, body, #app
                         cursor: pointer
                         &.fas.fa-times-circle
                             color: #D6D6D6
-                            margin-right: 15px
-                        &.fas.fa-play-circle
+                        &.fas.fa-play-circle, &.fas.fa-pause-circle
+                            margin-left: 15px
                             color: #D6D6D6
-                        &.fas.fa-pause-circle
-                            color: #FF8F00
+                            &.active
+                                color: #FF8F00
     .done
         height: 240px
         .title
@@ -158,6 +173,122 @@ html, body, #app
                     width: 20px
                     height: 20px
                     margin-right: 6px
+    .music
+        .title
+            height: 52px
+            background-color: #92F2E9
+            border-radius: 20px 20px 0 0
+        .content
+            color: #333232
+            padding: 15px 25px 50px
+            h6
+                font-size: 24px
+                font-weight: 700
+                margin-top: 16px
+                letter-spacing: 2.4px
+                position: relative
+                &:first-child
+                    margin-top: 0
+                .slider
+                    +trans
+                    display: inline-block
+                    width: 56px
+                    height: 30px
+                    border-radius: 18px
+                    background-color: #D6D6D6
+                    position: absolute
+                    left: 120px
+                    top: 0
+                    bottom: 0
+                    margin: auto
+                    cursor: pointer
+                    &::before
+                        +trans
+                        content: ''
+                        width: 24px
+                        height: 24px
+                        background-color: #fff
+                        border-radius: 50%
+                        position: absolute
+                        top: 0
+                        bottom: 0
+                        margin: auto
+                        left: 5px
+                input:checked + .slider
+                    background-color: #FF8F00
+                input:checked + .slider::before
+                        transform: translateX(24px)
+                input
+                    opacity: 0
+                    display: none
+            ul.alarm
+                li
+                    display: inline-block
+                    width: 110px
+                    margin-top: 12px
+                    i
+                        +trans
+                        width: 20px
+                        height: 20px
+                        font-size: 20px
+                        color: #D6D6D6
+                        margin-right: 6px
+                        cursor: pointer
+                        border-radius: 50%
+                        &.sel
+                            background-color: #80CBC4
+                            border-radius: 50%
+                            color: #80CBC4
+                    span
+                        font-size: 16px
+    .chart
+        .title
+            width: 100%
+            height: 52px
+            background-color: #92F2E9
+            border-radius: 20px 20px 0 0
+        .content
+            width: 100%
+            height: 468px
+            .tag
+                width: 100%
+                height: 44px
+                display: flex
+                .caption
+                    +flex-center
+                    width: 50%
+                    cursor: pointer
+                    &.active
+                        background-color: rgba(#80CBC4, .15)
+                    span
+                        font-size: 16px
+                        letter-spacing: 1.6px
+                        color: #333232
+                        font-weight: 700
+            .main_content
+                width: 100%
+                height: 424px
+                background-color: rgba(#80CBC4, .15)
+                border-radius: 0 0 20px 20px
+                padding: 15px 50px 25px
+                box-sizing: border-box
+                .text_content
+                    display: flex
+                    flex-wrap: wrap
+                    .text
+                        width: 98px
+                        margin: 15px 30px
+                        color: #707070
+                        &.week > h4
+                            color: #80CBC4
+                        &.day > h4
+                            color: #FF8F00
+                        h4
+                            font-size: 28px
+                            small
+                                font-size: 16px
+                        h6
+                            font-size: 14px
 .main
     margin-left: 120px
     padding-top: 40px
@@ -172,41 +303,59 @@ html, body, #app
         background-color: #fff
         box-shadow: 0px 3px 16px #00000029
         position: relative
-        &::before
+        &.focus::before, &.rest::before
             content: ''
             width: 396px
             height: 396px
             margin: 18px
+            border: 3px solid
             border-radius: 50%
-            border: 3px solid #80CBC4
             box-sizing: border-box
             background-color: #fff   
             position: absolute
             left: 0
             top: 0
-        &::after
+        &.focus::before
+            border-color: #80CBC4
+        &.rest::before
+            border-color: #7E57C2
+        &.focus::after, &.rest::after
             content: ''
             width: 360px
             height: 360px
             border-radius: 50%
-            border-top: 36px solid transparent
-            border-right: 36px solid #80CBC4
-            border-bottom: 36px solid #80CBC4
-            border-left: 36px solid transparent
+            border-width: 36px
+            border-style: solid
             opacity: 0.4
             position: absolute
             left: 0
             top: 0
             transform: rotate(-45deg)
-        .time
-            z-index: 2
+        &.focus::after
+            border-color: transparent #80CBC4 #80CBC4 transparent
+        &.rest::after
+            border-color: transparent #7E57C2 #7E57C2 transparent
+        &.focus > .clock_dec, &.rest > .clock_dec
+            width: 15px
+            height: 56px
+            border-radius: 15px
+            position: absolute
+            top: -20px
+        &.focus > .clock_dec
+            background-color: #80CBC4
+        &.rest > .clock_dec
+            background-color: #7E57C2
+        &.focus > .time, &.rest > .time
             font-size: 74px
-            font-weight: 700
+            font-weight: 700    
+            position: absolute
+        &.focus > .time
             color: #4F9A94
+        &.rest > .time
+            color: #7E57C2
     .controller
         width: 340px
         height: 78px
-        background-color: #80CBC4
         opacity: 0.6
         box-shadow: 0px 3px 6px #00000029
         border-radius: 20px
@@ -216,6 +365,10 @@ html, body, #app
         align-items: center
         padding: 0 60px
         box-sizing: border-box
+        &.focus
+            background-color: #80CBC4
+        &.rest
+            background-color: #B085F5
         i
             width: 36px
             height: 36px
@@ -227,12 +380,96 @@ html, body, #app
     flex-direction: column
     padding-top: 80px
     margin-left: 68px
+    &.focus > i.done
+        color: #80CBC4
+    &.rest > i.done
+        color: #7E57C2
     i
         width: 28px
         height: 28px
         font-size: 28px
-        margin-bottom: 10px
-        &.done
-            color: #80CBC4
+        margin-bottom: 10px    
         &.todo
             color: #E0E0E0
+// dialogbox
+.dialog_bg
+    width: calc(100% - 90px)
+    height: 100%
+    position: absolute
+    right: 0
+    background-color: rgba(white, .5)
+    backdrop-filter: blur(5px)
+    -webkit-backdrop-filter: blur(5px)
+    display: flex
+    justify-content: center
+    align-items: center
+    &.hidden
+        display: none
+    .dialogbox
+        width: 400px
+        // height: 300px
+        background-color: #fff
+        box-shadow: 0px 3px 6px #00000029
+        border-radius: 20px
+        color: #333232
+        .title
+            width: 100%
+            height: 52px
+            background-color: #92F2E9
+            border-radius: 20px 20px 0 0
+            font-size: 24px
+            padding: 8px 24px
+            box-sizing: border-box
+            font-weight: 700
+        .content
+            padding: 20px 25px
+            .info
+                .caption
+                    color: #8D8D8D
+                    font-size: 16px
+                    letter-spacing: 1.6px
+                    margin-bottom: 6px
+                input
+                    width: 100%
+                    margin-bottom: 24px
+                    border-top: 0
+                    border-right: 0
+                    border-bottom: 2px solid #D6D6D6
+                    border-left: 0
+                    font-size: 18px
+                    &:focus
+                        outline: none
+                .tomato
+                    display: flex
+                    flex-direction: row-reverse
+                    justify-content: flex-end
+                    i
+                        transition: color 0.5s
+                        width: 28px
+                        height: 28px
+                        font-size: 28px
+                        margin-right: 8px
+                        color: #D6D6D6
+                        border-radius: 50%
+                        cursor: pointer
+                        &:hover, &:hover ~ i, &.sel
+                            background-color: #80CBC4
+                            border-radius: 50%
+                            color: #80CBC4
+                h4
+                    font-weight: 400
+            .btn
+                display: flex
+                justify-content: flex-end
+                padding-top: 30px
+                .cancel
+                    background-color: #E4E4E4
+                    padding: 8px 32px
+                    border-radius: 20px
+                    cursor: pointer
+                .confirm
+                    background-color: #92F2E9
+                    padding: 8px 32px
+                    border-radius: 20px
+                    margin-left: 10px
+                    cursor: pointer
